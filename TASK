@@ -1,0 +1,106 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApplication1
+{
+
+    class Task
+    {
+        public static string Convert(string text)
+        {
+            var words = ParseWords(text);
+            var dic = GetLettersFrequences(words);
+            var letters = GetMaxLetters(dic);
+            var list = FilterWords(words, letters);
+            list.Sort(Sort);
+            var sb = new StringBuilder();// строит одну строку
+            foreach (var x in list)
+                sb.AppendLine(x);
+            return sb.ToString();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private static int Sort(string x, string y)
+        {
+            // x < y => -1
+            // x > y => 1
+            // x == y => 0
+            if (x.Length != y.Length)
+                return x.Length < y.Length ? 1 : -1;
+            return string.CompareOrdinal(x, y);
+        }
+
+
+        private static List<string> FilterWords(string[] words, List<char> letters)
+        {
+            var list = new List<string>();
+            for (int i = 0; i < words.Length; i++)
+            {
+                var word = words[i];
+                if (letters.Contains(word[0]))
+                    list.Add(word);
+            }
+            return list;
+        }
+        private static List<char> GetMaxLetters(Dictionary<char, int> dic)
+        {
+            List<char> list = new List<char>();
+            if (dic.Count == 0)
+                return list;
+            var max = dic.First().Value;
+            foreach (var pair in dic)
+            {
+                if (max < pair.Value)
+                    max = pair.Value;
+            }
+            foreach (var pair in dic)
+            {
+                if (max == pair.Value)
+                    list.Add(pair.Key);
+            }
+            return list;
+        }
+        private static Dictionary<char, int> GetLettersFrequences(string[] lines)
+        {
+            var dic = new Dictionary<char, int>();
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                for (int j = 0; j < line.Length; j++)
+                {
+                    var c = line[j];
+                    if (!dic.ContainsKey(c))
+                        dic.Add(c, 1);
+                    else
+                        dic[c]++;
+                }
+            }
+            return dic;
+        }
+        private static string[] ReadWordsFromFile(string filePath)
+        {
+            return File.ReadAllText(filePath).Split(new string[] { " ", Environment.NewLine, ",", ";", "." }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        private static string[] ParseWords(string text)
+        {
+            return text.Split(new string[] { " ", Environment.NewLine, ",", ";", "." }, StringSplitOptions.RemoveEmptyEntries);
+        }
+    }
+}
